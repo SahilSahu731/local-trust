@@ -5,6 +5,7 @@ import cors from "cors";
 import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
+import authRoute from "./routes/auth.route.js";
 
 dotenv.config();
 
@@ -19,7 +20,7 @@ const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
 });
-app.use('/api/', limiter);
+app.use('/api', limiter);
 
 // cors
 app.use(cors({
@@ -36,6 +37,10 @@ if (process.env.NODE_ENV === "development") {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+
+// Routes
+app.use("/api/v1/auth", authRoute);
 
 // test route
 app.get('/api/test', (req, res) => {
@@ -64,12 +69,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
-});
 
 export default app;
