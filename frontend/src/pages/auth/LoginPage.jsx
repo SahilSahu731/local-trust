@@ -1,23 +1,59 @@
 // src/pages/LoginPage.jsx
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../../components/layout/AuthLayout';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { AUTH_API_URL } from '../../utils/constant';
+import { authRequestFailure, authRequestSuccess } from '../../store/slices/authSlice';
+import { toast } from 'react-toastify';
 
 const LoginPage = () => {
     const [formData, setFormData] = useState({
         email: '',
         password: '',
     });
+     const {user, loading, error} = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Login form submitted:', formData);
-        // Add your login logic here
+        try {
+            const response = await axios.post(`${AUTH_API_URL}/login`, formData, {
+                withCredentials: true,
+            });
+            if (response.data.success) {
+                dispatch(authRequestSuccess(response.data));
+                toast.success('Login successful!');
+                navigate('/');
+                setFormData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    role: 'customer',
+                });
+            } else {
+                dispatch(authRequestFailure(response.data.message));
+                toast.error(response.data.message);
+            }
+            
+        } catch (error) {
+            console.log(error)
+            toast.error(error.response.data.message);
+        }
     };
+
+    useEffect(() => {
+        if (user) {
+            navigate('/');
+        }
+    }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <AuthLayout>
@@ -26,7 +62,7 @@ const LoginPage = () => {
                     <h1 className="text-4xl font-bold text-gray-800">Welcome Back!</h1>
                     <p className="mt-2 text-gray-500">Log in to continue with LocalTrust</p>
                 </div>
-
+                {error && <p className="text-red-500">{error}</p>}
                 <form onSubmit={handleSubmit} className="space-y-5">
                     <input type="email" name="email" placeholder="Email Address" onChange={handleChange} className="w-full p-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" required />
                     <input type="password" name="password" placeholder="Password" onChange={handleChange} className="w-full p-3 bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500" required />
@@ -41,8 +77,8 @@ const LoginPage = () => {
                         </a>
                     </div>
 
-                    <button type="submit" className="w-full font-bold text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-5 py-3 text-center transition-all duration-300">
-                        Log In
+                    <button type="submit" className="w-full font-bold text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-5 py-3 text-center transition-all cursor-pointer duration-300">
+                        {loading ? 'Loading...' : 'LOGIN'}
                     </button>
                 </form>
 

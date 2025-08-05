@@ -5,12 +5,12 @@ import Footer from '../shared/Footer';
 
 const MainLayout = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen overflow-hidden bg-slate-100 ">
       <Navbar />
       
       {/* Outlet will render the current page's component */}
       <main className="flex-grow">
-        <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="max-w-screen mx-auto py-6 sm:px-6 lg:px-8">
           <Outlet />
         </div>
       </main>

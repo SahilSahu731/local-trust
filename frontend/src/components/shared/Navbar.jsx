@@ -1,9 +1,28 @@
 import React, { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
+import {
+  Bars3Icon,
+  BriefcaseIcon,
+  HomeIcon,
+  MoonIcon,
+  SunIcon,
+  XMarkIcon,
+} from "@heroicons/react/24/solid";
+import { LayoutDashboard, LogOutIcon, MoveUpRight } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutSuccess } from "../../store/slices/authSlice";
+import { toggleTheme } from "../../store/slices/themeSlice";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
+  const { mode } = useSelector((state) => state.theme);
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const handleLogout = () => {
+    // You might also call the logoutUser service here if needed
+    dispatch(logoutSuccess());
+  };
 
   // Style for active NavLink
   const activeLinkStyle = {
@@ -13,7 +32,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-gradient-to-r from-gray-900 to-slate-800 shadow-lg sticky top-0 z-30">
+      <nav className="bg-blue-800 shadow-lg sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
@@ -31,7 +50,7 @@ const Navbar = () => {
                 <li>
                   <NavLink
                     to="/"
-                    className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                    className="text-gray-200 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
                     style={({ isActive }) =>
                       isActive ? activeLinkStyle : undefined
                     }
@@ -66,16 +85,49 @@ const Navbar = () => {
 
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex items-center space-x-4">
-              <Link to="/login">
-                <button className="text-gray-300 hover:text-white px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer">
-                  Login
-                </button>
-              </Link>
-              <Link to="/signup">
-                <button className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:from-teal-600 hover:to-blue-700 transition-all duration-300 cursor-pointer">
-                  Sign Up
-                </button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard">
+                  <button
+                    className="text-gray-300 hover:text-white flex gap-3 items-center border hover:bg-gray-800 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    <LayoutDashboard className="h-6 w-6" />
+                    Dashboard
+                  </button>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="text-gray-300 hover:text-white flex gap-3 items-center border hover:bg-gray-800 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    <LogOutIcon className="h-6 w-6" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <button className="text-gray-300 hover:text-white px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer">
+                      Login
+                    </button>
+                  </Link>
+                  <Link to="/signup">
+                    <button className="bg-gradient-to-r from-teal-500 to-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:from-teal-600 hover:to-blue-700 transition-all duration-300 cursor-pointer">
+                      Sign Up
+                    </button>
+                  </Link>
+                </>
+              )}
+
+              <button
+                onClick={() => dispatch(toggleTheme())}
+                className="p-2 rounded-lg cursor-pointer hidden text-gray-300 border border-gray-400 hover:bg-gray-700"
+              >
+                {mode === "light" ? (
+                  <MoonIcon className="h-6 w-6" />
+                ) : (
+                  <SunIcon className="h-6 w-6" />
+                )}
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -125,42 +177,65 @@ const Navbar = () => {
           <li>
             <NavLink
               to="/"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium cursor-pointer"
+              className="text-gray-300 hover:bg-gray-700 hover:text-white flex gap-3 items-center justify-start  px-3 py-2 rounded-md text-base font-medium cursor-pointer"
               onClick={() => setIsOpen(false)}
             >
+              <HomeIcon className="h-6 w-6" />
               Home
             </NavLink>
           </li>
           <li>
             <NavLink
               to="/services"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium cursor-pointer"
+              className="text-gray-300 hover:bg-gray-700 gap-3 hover:text-white flex items-center justify-start px-3 py-2 rounded-md text-base font-medium cursor-pointer"
               onClick={() => setIsOpen(false)}
             >
+              <BriefcaseIcon className="h-6 w-6" />
               Services
             </NavLink>
           </li>
           <li>
             <NavLink
               to="/about"
-              className="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium cursor-pointer"
+              className="text-gray-300 hover:bg-gray-700 hover:text-white flex items-center justify-start gap-3 px-3 py-2 rounded-md text-base font-medium cursor-pointer"
               onClick={() => setIsOpen(false)}
             >
+              <MoveUpRight className="h-6 w-6" />
               About
             </NavLink>
           </li>
         </ul>
         <div className="absolute bottom-5 left-5 right-5 space-y-3">
-          <Link to="/login">
-            <button className="w-full text-gray-300 border border-gray-600 hover:bg-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer">
-              Login
-            </button>
-          </Link>
-          <Link to="/signup">
-            <button className="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:from-teal-600 hover:to-blue-700 transition-all duration-300 cursor-pointer">
-              Sign Up
-            </button>
-          </Link>
+          {isAuthenticated ? (
+            <>
+            <Link to="/dashboard">
+              <button className="w-full text-gray-300 border mb-3 border-gray-600 flex gap-3 justify-start items-center hover:bg-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer">
+                <LayoutDashboard className="h-6 w-6" />
+                Dashboard
+              </button>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full text-gray-300 border border-gray-600 flex gap-3 justify-start items-center hover:bg-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+              >
+                <LogOutIcon className="h-6 w-6" />
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <button className="w-full text-gray-300 border mb-3 border-gray-600 hover:bg-gray-700 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer">
+                  Login
+                </button>
+              </Link>
+              <Link to="/signup">
+                <button className="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:from-teal-600 hover:to-blue-700 transition-all duration-300 cursor-pointer">
+                  Sign Up
+                </button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </>

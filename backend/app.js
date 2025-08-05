@@ -6,6 +6,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import authRoute from "./routes/auth.route.js";
+import providerRoute from "./routes/provider.route.js";
 
 dotenv.config();
 
@@ -41,15 +42,8 @@ app.use(cookieParser());
 
 // Routes
 app.use("/api/v1/auth", authRoute);
+app.use("/api/v1/provider", providerRoute);
 
-// test route
-app.get('/api/test', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Server is running!',
-    timestamp: new Date().toISOString()
-  });
-});
 
 // Health check route
 app.get('/api/health', (req, res) => {
